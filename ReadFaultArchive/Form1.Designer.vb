@@ -22,6 +22,7 @@ Partial Class Form1
     'Non modificarla mediante l'editor del codice.
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
+        Me.components = New System.ComponentModel.Container()
         Me.btnRead = New System.Windows.Forms.Button()
         Me.btnSelectOrigin = New System.Windows.Forms.Button()
         Me.OpenFileDialog1 = New System.Windows.Forms.OpenFileDialog()
@@ -30,6 +31,14 @@ Partial Class Form1
         Me.txtDestination = New System.Windows.Forms.TextBox()
         Me.OpenFileDialog2 = New System.Windows.Forms.OpenFileDialog()
         Me.SaveFileDialog1 = New System.Windows.Forms.SaveFileDialog()
+        Me.dgv1 = New System.Windows.Forms.DataGridView()
+        Me.WinCCComfort = New ReadFaultArchive.WinCCComfort()
+        Me.AlarmListBindingSource = New System.Windows.Forms.BindingSource(Me.components)
+        Me.AlarmListTableAdapter = New ReadFaultArchive.WinCCComfortTableAdapters.alarmListTableAdapter()
+        Me.btnFillTable = New System.Windows.Forms.Button()
+        CType(Me.dgv1, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.WinCCComfort, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.AlarmListBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'btnRead
@@ -52,7 +61,7 @@ Partial Class Form1
         '
         'OpenFileDialog1
         '
-        Me.OpenFileDialog1.Filter = "WinCC Alarms|Faults_Archive*_HMI_Panel.txt|All Files|*.*"
+        Me.OpenFileDialog1.Filter = "WinCC Alarms|Faults_Archive*.txt|All Files|*.*"
         '
         'txtSource
         '
@@ -85,11 +94,48 @@ Partial Class Form1
         '
         Me.SaveFileDialog1.Filter = "CSV File|*.csv|All Files|*.*"
         '
+        'dgv1
+        '
+        Me.dgv1.AllowUserToAddRows = False
+        Me.dgv1.AllowUserToDeleteRows = False
+        Me.dgv1.AllowUserToOrderColumns = True
+        Me.dgv1.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgv1.Location = New System.Drawing.Point(12, 238)
+        Me.dgv1.Name = "dgv1"
+        Me.dgv1.ReadOnly = True
+        Me.dgv1.Size = New System.Drawing.Size(763, 172)
+        Me.dgv1.TabIndex = 5
+        '
+        'WinCCComfort
+        '
+        Me.WinCCComfort.DataSetName = "WinCCComfort"
+        Me.WinCCComfort.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
+        '
+        'AlarmListBindingSource
+        '
+        Me.AlarmListBindingSource.DataMember = "alarmList"
+        Me.AlarmListBindingSource.DataSource = Me.WinCCComfort
+        '
+        'AlarmListTableAdapter
+        '
+        Me.AlarmListTableAdapter.ClearBeforeFill = True
+        '
+        'btnFillTable
+        '
+        Me.btnFillTable.Location = New System.Drawing.Point(11, 211)
+        Me.btnFillTable.Name = "btnFillTable"
+        Me.btnFillTable.Size = New System.Drawing.Size(51, 27)
+        Me.btnFillTable.TabIndex = 6
+        Me.btnFillTable.Text = "Button1"
+        Me.btnFillTable.UseVisualStyleBackColor = True
+        '
         'Form1
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(800, 450)
+        Me.Controls.Add(Me.btnFillTable)
+        Me.Controls.Add(Me.dgv1)
         Me.Controls.Add(Me.txtDestination)
         Me.Controls.Add(Me.btnSelectDestination)
         Me.Controls.Add(Me.txtSource)
@@ -97,6 +143,9 @@ Partial Class Form1
         Me.Controls.Add(Me.btnRead)
         Me.Name = "Form1"
         Me.Text = "Form1"
+        CType(Me.dgv1, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.WinCCComfort, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.AlarmListBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -110,4 +159,9 @@ Partial Class Form1
     Friend WithEvents txtDestination As TextBox
     Friend WithEvents OpenFileDialog2 As OpenFileDialog
     Friend WithEvents SaveFileDialog1 As SaveFileDialog
+    Friend WithEvents dgv1 As DataGridView
+    Friend WithEvents WinCCComfort As WinCCComfort
+    Friend WithEvents AlarmListBindingSource As BindingSource
+    Friend WithEvents AlarmListTableAdapter As WinCCComfortTableAdapters.alarmListTableAdapter
+    Friend WithEvents btnFillTable As Button
 End Class

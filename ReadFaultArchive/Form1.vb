@@ -1,4 +1,5 @@
 ﻿Imports System.Data.OleDb
+Imports System.Data.SqlClient
 Imports System.IO
 
 Public Class Form1
@@ -8,20 +9,38 @@ Public Class Form1
 
 
 
+    Private Function readFile() As String
+        Dim strfilename As String = txtSource.Text
+        Dim SR As StreamReader = New StreamReader(strfilename)
+        Dim filedata As String = SR.ReadToEnd
+        filedata = filedata.Replace(vbLf, "")
+        filedata = filedata.Replace("""", String.Empty)
+
+        Return filedata
+    End Function
+
 
     Private Sub btnRead_Click(sender As Object, e As EventArgs) Handles btnRead.Click
 
 
-        Dim separator As Char = vbTab
+        'Dim separator As Char = vbTab
 
-        Dim strfilename As String = "C:\ZZZZ_Chiavetta USB\Faults_Archive0_20190924_073636_HMI_Panel.txt"
-        Dim SR As StreamReader = New StreamReader(strfilename)
-        Dim filedata As String = SR.ReadToEnd
+        'Dim strfilename As String = "C:\ZZZZ_Chiavetta USB\Faults_Archive0_20190924_073636_HMI_Panel.txt"
+        'Dim SR As StreamReader = New StreamReader(strfilename)
+        'Dim filedata As String = SR.ReadToEnd
+        'filedata = filedata.Replace(vbLf, "")
+        'filedata = filedata.Replace("""", String.Empty)
 
-        filedata = filedata.Replace(vbLf, "")
-        filedata = filedata.Replace("""", String.Empty)
+        Dim filedata As String = readFile()
+
+
+
 
         Dim faultsWinccFormat = gio(filedata)
+
+
+
+
 
         createStartEndAlarmList(faultsWinccFormat)
 
@@ -33,7 +52,9 @@ Public Class Form1
     Structure strFaultsArchive
         Dim ms As Double '0
         Dim stateAFter As Int16 '2
+        Dim MsgClass As Int16 '3
         Dim msgNumber As Int16 '4
+        Dim var1 As Int16 '5
         Dim dateTimeString As String '13
         Dim msgText As String '14
     End Structure
@@ -63,9 +84,22 @@ Public Class Form1
             Try
                 rowStructured.ms = Double.Parse(arrWork(0)) / 1000
                 rowStructured.stateAFter = Int16.Parse(arrWork(2))
+                rowStructured.MsgClass = Int16.Parse(arrWork(3))
                 rowStructured.msgNumber = Int16.Parse(arrWork(4))
+                Try
+                    rowStructured.var1 = Int16.Parse(arrWork(5))
+                Catch ex As Exception
+                    rowStructured.var1 = 0
+                End Try
+                '
                 rowStructured.dateTimeString = arrWork(13)
                 rowStructured.msgText = arrWork(14)
+
+
+
+                DB.InsertAlarmDefinition(rowStructured.msgNumber, rowStructured.msgText, rowStructured.MsgClass)
+                DB.InsertAlarm(rowStructured.msgNumber, rowStructured.dateTimeString, rowStructured.var1, rowStructured.stateAFter, rowStructured.msgText)
+
 
                 rows.Add(rowStructured)
             Catch ex As Exception
@@ -201,4 +235,35 @@ Public Class Form1
         SaveFileDialog1.ShowDialog()
         txtDestination.Text = SaveFileDialog1.FileName
     End Sub
+
+    Private Sub Form1_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        'TODO: questa riga di codice carica i dati nella tabella 'WinCCComfort.alarmList'. È possibile spostarla o rimuoverla se necessario.
+        Me.AlarmListTableAdapter.Fill(Me.WinCCComfort.alarmList)
+
+    End Sub
+
+    Private Sub btnFillTable_Click(sender As Object, e As EventArgs) Handles btnFillTable.Click
+
+
+        BindGrid()
+
+    End Sub
+
+
+    Private Sub BindGrid()
+        Dim constring As String = "Data Source=(local)\SQLEXPRESS;Initial Catalog=LYS8;Integrated Security=True"
+        Using con As New SqlConnection(constring)
+            Using cmd As New SqlCommand("SELECT * FROM alarmList", con)
+                cmd.CommandType = CommandType.Text
+                Using sda As New SqlDataAdapter(cmd)
+                    Using ds As New DataSet()
+                        sda.Fill(ds)
+                        dgv1.DataSource = ds.Tables(0)
+                    End Using
+                End Using
+            End Using
+        End Using
+    End Sub
+
+
 End Class
